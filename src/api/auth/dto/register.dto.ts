@@ -18,7 +18,7 @@ export class RegisterDto {
     example: 'Jon Doe',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(2)
   @MaxLength(30)
   full_name: string;
@@ -28,6 +28,7 @@ export class RegisterDto {
     example: '+998901234567',
   })
   @IsPhoneNumber()
+  @IsOptional()
   phone_number: string;
 
   @ApiProperty({
@@ -35,6 +36,7 @@ export class RegisterDto {
     example: 'johndoe123@gmail.com',
   })
   @IsEmail()
+  @IsOptional()
   email: string;
 
   @ApiProperty({
@@ -44,13 +46,13 @@ export class RegisterDto {
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(8)
+  @MinLength(6)
   @MaxLength(32)
   @Matches(
-    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    /^(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
     {
       message:
-        'Password kamida 8 ta belgi, bitta katta harf, bitta kichik harf, bitta raqam va bitta maxsus belgi (@$!%*?&) bo‘lishi kerak',
+        'Password kamida 6 ta belgi, bitta kichik harf, bitta raqam bo‘lishi kerak',
     },
   )
   password: string;

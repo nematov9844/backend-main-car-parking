@@ -1,41 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService as NestJwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { config } from 'src/config';
 
 @Injectable()
-export class CustomJwtService {
-  constructor(private readonly jwtService: NestJwtService) {}
+export class TokenService {
+  constructor(private readonly jwtService: JwtService) {}
 
-  // Access token yaratish
-  async generateAccessToken(payload: any): Promise<string> {
-    return this.jwtService.signAsync(payload, {
+  createAccessToken(payload: any): string {
+    return this.jwtService.sign(payload, {
       secret: config.ACCESS_TOKEN_SECRET_KEY,
       expiresIn: config.ACCESS_TOKEN_EXPIRE_TIME,
     });
   }
 
-  // Refresh token yaratish
-  async generateRefreshToken(payload: any): Promise<string> {
-    return this.jwtService.signAsync(payload, {
+  createRefreshToken(payload: any): string {
+    return this.jwtService.sign(payload, {
       secret: config.REFRESH_TOKEN_SECRET_KEY,
       expiresIn: config.REFRESH_TOKEN_EXPIRE_TIME,
     });
   }
-
-  // Tokenni tekshirish
-  async verifyToken(
-    token: string,
-    isRefreshToken: boolean = false,
-  ): Promise<any> {
+  async verifyAccessToken(token: string): Promise<any> {
     try {
-      return await this.jwtService.verifyAsync(token, {
-        secret: isRefreshToken
-          ? config.REFRESH_TOKEN_SECRET_KEY
-          : config.ACCESS_TOKEN_SECRET_KEY,
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: config.ACCESS_TOKEN_SECRET_KEY,
       });
+      return payload;
     } catch (error) {
-      console.log(error);
-      throw new Error('Token is invalid or expired');
+      console.error('Token verification failed:', error.message);
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
+  async verifyRefreshToken(token: string): Promise<any> {
+    try {
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: config.REFRESH_TOKEN_SECRET_KEY,
+      });
+      return payload;
+    } catch (error) {
+      console.error('Token verification failed:', error.message);
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }

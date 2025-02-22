@@ -4,3 +4,7 @@ export enum UserRoles {
   superAdmin = 'SUPERADMIN',
   parkingAdmin = 'PARKING_ADMIN',
 }
+export enum CarTypes {
+  b = 'B',
+  c = 'C',
+}

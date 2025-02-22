@@ -32,6 +32,22 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(config.PORT, () => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    const ids = [
+      "8334f9f6-927e-4fec-a0b3-a925f49acc98",
+      "1c373b18-43b3-423f-b97e-78329b46e624",
+      "85c6f4c0-03a3-40fa-930b-7b5ef996716d",
+      "1ae17a8a-e662-4181-85c8-8a90d2b90f08",
+      "555f5e89-766f-45e5-9a2e-ea213d0c6edf"
+    ];
+
+    ids.forEach(id => {
+      if (!uuidRegex.test(id)) {
+        console.log(`Xato UUID: ${id}`);
+      }
+    });
+
     console.log(`Running in ${config.PORT}`);
   });
 }

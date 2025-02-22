@@ -19,15 +19,15 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from '../../core/entity/user.entity';
-import { RolesGuard } from '../../common/guards/roles.guard'; // RolesGuard import qilish
 import { Roles } from 'src/common/decorators/roles.decorators';
 import { UserRoles } from 'src/common/database/Enums';
+import { RolesGuard } from 'src/common/guards/role.guard';
 
-@ApiTags('users')
+@ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   // Create user
   @Post()
@@ -38,7 +38,7 @@ export class UserController {
     type: UserEntity,
   })
   @ApiResponse({ status: 400, description: 'Bad Request' })
-  @Roles(UserRoles.admin) // faqat adminlar yaratishi mumkin
+  @Roles(UserRoles.admin, UserRoles.user) // faqat adminlar yaratishi mumkin
   @UseGuards(RolesGuard)
   async create(@Body() createUserDto: CreateUserDto): Promise<UserEntity> {
     return this.userService.createUser(createUserDto);
@@ -52,7 +52,7 @@ export class UserController {
     description: 'List of users',
     type: [UserEntity],
   })
-  @Roles(UserRoles.admin) // faqat adminlar ro‘yxatni ko‘rishi mumkin
+  @Roles(UserRoles.admin, UserRoles.user) // faqat adminlar ro‘yxatni ko‘rishi mumkin
   @UseGuards(RolesGuard)
   async findAll(): Promise<UserEntity[]> {
     return this.userService.findAllUsers();
@@ -64,7 +64,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({ status: 200, description: 'User found', type: UserEntity })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @Roles(UserRoles.admin) // faqat adminlar ko‘rishi mumkin
+  @Roles(UserRoles.admin, UserRoles.user)
   @UseGuards(RolesGuard)
   async findOne(@Param('id') id: string): Promise<UserEntity> {
     return this.userService.findOneUser(id);
@@ -76,7 +76,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({ status: 200, description: 'User updated', type: UserEntity })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @Roles(UserRoles.admin) // faqat adminlar yangilay oladi
+  @Roles(UserRoles.admin, UserRoles.user)
   @UseGuards(RolesGuard)
   async update(
     @Param('id') id: string,
@@ -91,7 +91,7 @@ export class UserController {
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiResponse({ status: 200, description: 'User deleted' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  @Roles(UserRoles.admin) // faqat adminlar o‘chirishlari mumkin
+  @Roles(UserRoles.admin, UserRoles.user) // faqat adminlar o‘chirishlari mumkin
   @UseGuards(RolesGuard)
   async remove(@Param('id') id: string): Promise<void> {
     return this.userService.removeUser(id);

@@ -4,10 +4,10 @@ import {
   IsNotEmpty,
   MinLength,
   MaxLength,
-  Matches,
   IsEnum,
   IsOptional,
   IsEmail,
+  Matches,
 } from 'class-validator';
 import { UserRoles } from 'src/common/database/Enums';
 import { IsPhoneNumber } from 'src/common/decorators/isPhoneNumber';

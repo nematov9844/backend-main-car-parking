@@ -1,6 +1,9 @@
 import { BaseEntity } from 'src/common/database/BaseEntity';
 import { UserRoles } from 'src/common/database/Enums';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
+import { ReservationEntity } from './reservation.entity';
+import { CardEntity } from './card.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity('user')
 export class UserEntity extends BaseEntity {
@@ -38,4 +41,13 @@ export class UserEntity extends BaseEntity {
     default: UserRoles.user,
   })
   role: UserRoles;
+
+  @OneToMany(() => ReservationEntity, (reservation) => reservation.user)
+  reservations: ReservationEntity[];
+
+  @OneToMany(() => CardEntity, (card) => card.user)
+  cards: CardEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments: CommentEntity[];
 }

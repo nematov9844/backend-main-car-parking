@@ -1,27 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from '../../core/entity/user.entity';
+import { BcryptService } from 'src/common/bcrypt/bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-  ) {}
+    private readonly bcryptService: BcryptService,
+  ) { }
 
-  // Create user
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
-    //Parolni hach qilish
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = this.userRepository.create({
+    const hashedPassword = await this.bcryptService.encrypt(
+      createUserDto.password,
+    );
+    return await this.userRepository.save({
       ...createUserDto,
       password: hashedPassword,
     });
-    return await this.userRepository.save(user);
   }
 
   // Get all users
@@ -38,21 +38,37 @@ export class UserService {
     return await this.userRepository.findOne({ where: { phone_number } });
   }
 
+  async findOneByEmail(email: string): Promise<UserEntity> {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
   // Update user
   async updateUser(id: string, updateDto: UpdateUserDto): Promise<UserEntity> {
-    let hashPassword: string | null = null;
     if (updateDto.password) {
-      hashPassword = await bcrypt.hash(updateDto.password, 10);
+      updateDto.password = await this.bcryptService.encrypt(updateDto.password);
     }
-    if (hashPassword) {
-      updateDto.password = hashPassword;
-    }
-    this.userRepository.update(id, updateDto);
+    await this.userRepository.update(id, updateDto);
     return await this.userRepository.findOne({ where: { id } });
   }
 
   // Delete user
   async removeUser(id: string): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  async checkByEmail(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOneBy({ email });
+    if (user) {
+      return true;
+    }
+    return false;
+  }
+
+  async checkByPhoneNumber(phone_number: string) {
+    const user = await this.userRepository.findOneBy({ phone_number });
+    if (user) {
+      return true;
+    }
+    return false;
   }
 }
